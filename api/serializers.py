@@ -15,7 +15,7 @@ def token_payload(user):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model=Profile
-        fields=['user_type','phone','school','county','career_interest','parent_name','parent_email','teacher_name','teacher_email','auto_parent_reports','auto_teacher_reports','report_frequency','privacy_settings']
+        fields=['user_type','phone','school','county','career_interest','parent_name','parent_email','teacher_name','teacher_email','auto_parent_reports','auto_teacher_reports','report_frequency']
 
 class UserSerializer(serializers.ModelSerializer):
     profile=ProfileSerializer(read_only=True)
@@ -209,20 +209,31 @@ class MpesaPaymentSerializer(serializers.ModelSerializer):
 class BookSerializer(serializers.ModelSerializer):
     cover_url=serializers.SerializerMethodField()
     file_url=serializers.SerializerMethodField()
+    pdf_url=serializers.SerializerMethodField()
+    
     class Meta:
         model=Book
-        fields=['id','title','slug','author','description','text_content','category','grade','language','program','cover','cover_url','file','file_url','external_url','reading_level','pages','estimated_minutes','xp_reward','is_featured','is_published','metadata','created_at','updated_at']
+        fields=['id','title','slug','author','description','text_content','category','grade','language','program','cover','cover_url','file','file_url','pdf','pdf_url','external_url','reading_level','pages','estimated_minutes','xp_reward','is_featured','is_published','metadata','created_at','updated_at']
         read_only_fields=['slug','created_at','updated_at']
+    
     def get_cover_url(self,obj):
         request=self.context.get('request')
         if obj.cover:
             return request.build_absolute_uri(obj.cover.url) if request else obj.cover.url
         return ''
+    
     def get_file_url(self,obj):
         request=self.context.get('request')
         if obj.file:
             return request.build_absolute_uri(obj.file.url) if request else obj.file.url
         return obj.external_url or ''
+    
+    def get_pdf_url(self, obj):
+        """Return absolute URL for PDF file (for Readathon viewer)"""
+        request = self.context.get('request')
+        if obj.pdf:
+            return request.build_absolute_uri(obj.pdf.url) if request else obj.pdf.url
+        return ''
 
 class UserBookSerializer(serializers.ModelSerializer):
     book_detail=BookSerializer(source='book',read_only=True)
