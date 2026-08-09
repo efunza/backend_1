@@ -276,6 +276,12 @@ class Book(TimeStampedModel):
 
     cover = models.ImageField(upload_to="books/covers/", null=True, blank=True)
     file = models.FileField(upload_to="books/files/", null=True, blank=True)
+    pdf = models.FileField(
+        upload_to="books/pdfs/",
+        null=True,
+        blank=True,
+        help_text="PDF file for the book (for Readathon display)"
+    )
     external_url = models.URLField(blank=True)
 
     reading_level = models.CharField(max_length=100, blank=True)

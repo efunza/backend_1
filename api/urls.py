@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 from .views import *
+from .maritime_views import MaritimeCourseViewSet, MaritimeEnrollmentViewSet
 
 # ============================================================
 # MAIN ROUTER
@@ -41,6 +42,11 @@ router.register('boarding-pro', BoardingProViewSet, basename='boarding-pro')
 router.register('smart-boarding-plus', SmartBoardingPlusViewSet, basename='smart-boarding-plus')
 router.register('readathon/reports', ReadathonReportViewSet, basename='readathon-report')
 router.register('readathon/interventions', InterventionNoteViewSet, basename='readathon-intervention')
+# ============================================================
+# 🚢 MARITIME ACADEMY ROUTER
+# ============================================================
+router.register('maritime-courses', MaritimeCourseViewSet, basename='maritime-course')
+router.register('maritime-enrollments', MaritimeEnrollmentViewSet, basename='maritime-enrollment')
 
 # ============================================================
 # 🛒 STORE ROUTER
