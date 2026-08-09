@@ -544,7 +544,7 @@ except Exception:
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
-    list_display = ['title', 'duration', 'created_at']
+    list_display = ['title', 'topic', 'created_at']
     search_fields = ['title', 'description']
 
 # ============================================================
@@ -558,7 +558,7 @@ except Exception:
 
 @admin.register(ContentItem)
 class ContentItemAdmin(admin.ModelAdmin):
-    list_display = ['title', 'content_type', 'order', 'created_at']
+    list_display = ['title', 'content_type', 'created_at']
     list_filter = ['content_type']
     search_fields = ['title']
 
@@ -668,9 +668,9 @@ try:
     
     @admin.register(ELabProject)
     class ELabProjectAdmin(admin.ModelAdmin):
-        list_display = ['title', 'user', 'category', 'stage', 'created_at']
+        list_display = ['title', 'category', 'stage', 'created_at']
         list_filter = ['category', 'stage']
-        search_fields = ['title', 'description', 'user__username']
+        search_fields = ['title', 'description']
     
     try:
         admin.site.unregister(ELabMilestone)
@@ -689,9 +689,8 @@ try:
     
     @admin.register(StudentAIInsight)
     class StudentAIInsightAdmin(admin.ModelAdmin):
-        list_display = ['user', 'insight_type', 'created_at']
-        list_filter = ['insight_type']
-        search_fields = ['user__username', 'insight_content']
+        list_display = ['created_at']
+        search_fields = ['insight_content']
     
     try:
         admin.site.unregister(AIChatLog)
@@ -700,9 +699,9 @@ try:
     
     @admin.register(AIChatLog)
     class AIChatLogAdmin(admin.ModelAdmin):
-        list_display = ['user', 'agent', 'module', 'created_at']
+        list_display = ['agent', 'module', 'created_at']
         list_filter = ['agent', 'module']
-        search_fields = ['user__username', 'prompt', 'response']
+        search_fields = ['prompt', 'response']
         
 except ImportError:
     pass
