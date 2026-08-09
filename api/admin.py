@@ -689,8 +689,7 @@ try:
     
     @admin.register(StudentAIInsight)
     class StudentAIInsightAdmin(admin.ModelAdmin):
-        list_display = ['created_at']
-        search_fields = ['insight_content']
+        list_display = ['id']
     
     try:
         admin.site.unregister(AIChatLog)
