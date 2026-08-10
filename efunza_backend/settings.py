@@ -70,7 +70,6 @@ WSGI_APPLICATION = 'efunza_backend.wsgi.application'
 # ============================================================
 # DATABASE
 # ============================================================
-
 import dj_database_url
 
 DATABASE_URL = config('DATABASE_URL', default=None)
@@ -172,8 +171,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5173',
-    'http://localhost:5174',
-    'http://127.0.0.1:5174',
+    'http://localhost:5174',        # <-- added for dev server
+    'http://127.0.0.1:5174',        # <-- added for dev server
     # Production - Backend
     'https://efunza.jamelecinnovations.com',
     # Production - Frontend (YOUR APP DOMAIN)
@@ -298,4 +297,125 @@ CELERY_TIMEZONE = TIME_ZONE
 # CACHING (Optional)
 # ============================================================
 
-I want to update the file but user pasted file with duplicate entries earlier; they said 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+if config('REDIS_URL', default=''):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': config('REDIS_URL'),
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
+        }
+    }
+
+# ============================================================
+# SECURITY (Production Only)
+# ============================================================
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# ============================================================
+# LOGGING
+# ============================================================
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'errors.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'ERROR' if not DEBUG else 'DEBUG',
+            'propagate': True,
+        },
+        'api': {
+            'handlers': ['file', 'console'],
+            'level': 'ERROR' if not DEBUG else 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+# Create logs directory
+try:
+    os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
+except Exception:
+    pass
+
+# ============================================================
+# SENTRY (Error Tracking)
+# ============================================================
+
+try:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+    
+    SENTRY_DSN = config('SENTRY_DSN', default='')
+    
+    if SENTRY_DSN and not DEBUG:
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+            integrations=[DjangoIntegration()],
+            traces_sample_rate=0.1,
+            send_default_pii=True,
+            environment=ENVIRONMENT,
+        )
+except ImportError:
+    pass
+except Exception as e:
+    pass
+
+# ============================================================
+# LOAD ENVIRONMENT VARIABLES
+# ============================================================
+
+# Print startup info
+print("=" * 60)
+print("Efunza Backend Settings Loaded")
+print(f"Environment: {ENVIRONMENT}")
+print(f"Debug Mode: {DEBUG}")
+print(f"Static Root: {STATIC_ROOT}")
+print(f"Media Root: {MEDIA_ROOT}")
+print(f"Database: {DATABASES['default']['ENGINE'].rsplit('.', 1)[-1]}")
+print(f"CORS Allowed Origins: {len(CORS_ALLOWED_ORIGINS)} origins")
+print(f"CORS Allow Credentials: {CORS_ALLOW_CREDENTIALS}")
+print("=" * 60)
